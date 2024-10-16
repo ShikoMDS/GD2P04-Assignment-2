@@ -46,11 +46,20 @@ public:
 	void setVec3(const std::string& Name, const glm::vec3& Value) const;
 	void setVec3(const std::string& Name, float X, float Y, float Z) const;
 	void setMat4(const std::string& Name, const glm::mat4& Mat) const;
-	void setMaterial(const std::string& Name, const Material& Material) const;
 	void setLight(const std::string& Name, const Light& Light) const;
 
 	static void checkCompileErrors(unsigned int Shader, const std::string& Type);
 	static void checkLinkErrors(unsigned int Program);
 
 	unsigned int Id;
+
+	// Inside Shader.h
+	void setMaterial(const Material& material)
+	{
+		setVec3("material.ambient", material.Ambient);
+		setVec3("material.diffuse", material.Diffuse);
+		setVec3("material.specular", material.Specular);
+		setFloat("material.shininess", material.Shininess);
+	}
+
 };

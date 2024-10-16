@@ -128,3 +128,16 @@ void InputManager::scrollCallback(GLFWwindow* Window, double OffsetX, const doub
 {
     MCamera.processMouseScroll(static_cast<float>(OffsetY));
 }
+
+void InputManager::enableRawMouseMotion(GLFWwindow* window)
+{
+    if (glfwRawMouseMotionSupported())  // Check if raw mouse motion is supported
+    {
+        glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);  // Enable raw mouse motion
+        std::cout << "Raw mouse motion enabled." << std::endl;
+    }
+    else
+    {
+        std::cout << "Raw mouse motion not supported on this system." << std::endl;
+    }
+}

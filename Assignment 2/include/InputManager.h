@@ -30,6 +30,7 @@ public:
     void frameBufferSizeCallback(GLFWwindow* Window, int Width, int Height);
     void mouseCallback(GLFWwindow* Window, double PosX, double PosY);
     void scrollCallback(GLFWwindow* Window, double OffsetX, double OffsetY) const;
+	void enableRawMouseMotion(GLFWwindow* window);
     void toggleWireframeMode();
     void toggleCursorVisibility(GLFWwindow* Window);
     void changeScene(int sceneNumber);  // Function to switch scenes

@@ -18,81 +18,57 @@ Mail : ayoub.ahmad@mds.ac.nz
 #include <sstream>
 #include <iostream>
 
-Shader::Shader(const char* VertexPath, const char* FragmentPath)
+Shader::Shader(const char* vertexPath, const char* fragmentPath)
 {
-	// Retrieve the vertex/fragment source code from filePath
-	std::string VertexCode;
-	std::string FragmentCode;
-	std::ifstream VShaderFile;
-	std::ifstream FShaderFile;
-	// Ensure ifstream objects can throw exceptions
-	VShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-	FShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-	try
-	{
-		// Open files
-		VShaderFile.open(VertexPath);
-		FShaderFile.open(FragmentPath);
-		std::stringstream VShaderStream, FShaderStream;
-		// Read file's buffer contents into streams
-		VShaderStream << VShaderFile.rdbuf();
-		FShaderStream << FShaderFile.rdbuf();
-		// Close file handlers
-		VShaderFile.close();
-		FShaderFile.close();
-		// Convert stream into string
-		VertexCode = VShaderStream.str();
-		FragmentCode = FShaderStream.str();
-	}
-	catch (std::ifstream::failure& e)
-	{
-		std::cerr << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
-	}
-	const char* VShaderCode = VertexCode.c_str();
-	const char* FShaderCode = FragmentCode.c_str();
+    // 1. Retrieve shader source code
+    std::string vertexCode, fragmentCode;
+    std::ifstream vShaderFile, fShaderFile;
 
-	// Compile shaders
-	unsigned int Vertex, Fragment;
-	int Success;
-	char InfoLog[512];
+    // Ensure ifstream objects can throw exceptions
+    vShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+    fShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+    try
+    {
+        vShaderFile.open(vertexPath);
+        fShaderFile.open(fragmentPath);
+        std::stringstream vShaderStream, fShaderStream;
+        vShaderStream << vShaderFile.rdbuf();
+        fShaderStream << fShaderFile.rdbuf();
+        vShaderFile.close();
+        fShaderFile.close();
+        vertexCode = vShaderStream.str();
+        fragmentCode = fShaderStream.str();
+    }
+    catch (std::ifstream::failure& e)
+    {
+        std::cerr << "ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ\n";
+    }
 
-	// Vertex shader
-	Vertex = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(Vertex, 1, &VShaderCode, nullptr);
-	glCompileShader(Vertex);
-	glGetShaderiv(Vertex, GL_COMPILE_STATUS, &Success);
-	if (!Success)
-	{
-		glGetShaderInfoLog(Vertex, 512, nullptr, InfoLog);
-		std::cerr << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << InfoLog << '\n';
-	}
+    const char* vShaderCode = vertexCode.c_str();
+    const char* fShaderCode = fragmentCode.c_str();
 
-	// Fragment shader
-	Fragment = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(Fragment, 1, &FShaderCode, nullptr);
-	glCompileShader(Fragment);
-	glGetShaderiv(Fragment, GL_COMPILE_STATUS, &Success);
-	if (!Success)
-	{
-		glGetShaderInfoLog(Fragment, 512, nullptr, InfoLog);
-		std::cerr << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << InfoLog << '\n';
-	}
+    // 2. Compile shaders
+    unsigned int vertex, fragment;
+    vertex = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertex, 1, &vShaderCode, nullptr);
+    glCompileShader(vertex);
+    checkCompileErrors(vertex, "VERTEX");
 
-	// Shader program
-	Id = glCreateProgram();
-	glAttachShader(Id, Vertex);
-	glAttachShader(Id, Fragment);
-	glLinkProgram(Id);
-	glGetProgramiv(Id, GL_LINK_STATUS, &Success);
-	if (!Success)
-	{
-		glGetProgramInfoLog(Id, 512, nullptr, InfoLog);
-		std::cerr << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << InfoLog << '\n';
-	}
+    fragment = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragment, 1, &fShaderCode, nullptr);
+    glCompileShader(fragment);
+    checkCompileErrors(fragment, "FRAGMENT");
 
-	// Delete the shaders as they are now linked and no longer necessary
-	glDeleteShader(Vertex);
-	glDeleteShader(Fragment);
+    // 3. Link shaders to program
+    Id = glCreateProgram();
+    glAttachShader(Id, vertex);
+    glAttachShader(Id, fragment);
+    glLinkProgram(Id);
+    checkLinkErrors(Id);
+
+    // 4. Delete shaders as they're linked now
+    glDeleteShader(vertex);
+    glDeleteShader(fragment);
 }
 
 void Shader::use() const
@@ -128,14 +104,6 @@ void Shader::setVec3(const std::string& Name, const float X, const float Y, cons
 void Shader::setMat4(const std::string& Name, const glm::mat4& Mat) const
 {
 	glUniformMatrix4fv(glGetUniformLocation(Id, Name.c_str()), 1, GL_FALSE, &Mat[0][0]);
-}
-
-void Shader::setMaterial(const std::string& Name, const Material& Material) const
-{
-	setVec3(Name + ".ambient", Material.Ambient);
-	setVec3(Name + ".diffuse", Material.Diffuse);
-	setVec3(Name + ".specular", Material.Specular);
-	setFloat(Name + ".shininess", Material.Shininess);
 }
 
 void Shader::setLight(const std::string& Name, const Light& Light) const

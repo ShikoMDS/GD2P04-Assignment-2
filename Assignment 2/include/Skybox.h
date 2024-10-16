@@ -25,7 +25,7 @@ Mail : ayoub.ahmad@mds.ac.nz
 class Skybox
 {
 public:
-	Skybox(const std::vector<std::string>& Faces);
+	Skybox();
 
 	void draw(const Shader& Shader) const;
 	void render(const Shader& skyboxShader, const Camera& camera, int scrWidth, int scrHeight) const;
@@ -37,4 +37,6 @@ private:
 	unsigned int MVao;
 	unsigned int MVbo;
 	unsigned int MCubeMapTexture;
+
+	std::vector<std::string> Faces;
 };

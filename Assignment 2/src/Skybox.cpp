@@ -18,8 +18,15 @@ Mail : ayoub.ahmad@mds.ac.nz
 
 #include <iostream>
 
-Skybox::Skybox(const std::vector<std::string>& Faces)
+Skybox::Skybox()
 {
+	Faces = { "resources/skybox/Corona/Right.png",
+		"resources/skybox/Corona/Left.png",
+		"resources/skybox/Corona/Bottom.png",
+		"resources/skybox/Corona/Top.png",
+		"resources/skybox/Corona/Back.png",
+		"resources/skybox/Corona/Front.png" };
+
 	MCubeMapTexture = loadCubeMap(Faces);
 	setupSkybox();
 }
