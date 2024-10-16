@@ -22,8 +22,8 @@ Skybox::Skybox()
 {
 	Faces = { "resources/skybox/Corona/Right.png",
 		"resources/skybox/Corona/Left.png",
-		"resources/skybox/Corona/Bottom.png",
 		"resources/skybox/Corona/Top.png",
+		"resources/skybox/Corona/Bottom.png",
 		"resources/skybox/Corona/Back.png",
 		"resources/skybox/Corona/Front.png" };
 
@@ -45,9 +45,25 @@ void Skybox::render(const Shader& skyboxShader, const Camera& camera, int scrWid
 	glDepthFunc(GL_LEQUAL); // Ensure skybox is drawn correctly
 	skyboxShader.use();
 	skyboxShader.setMat4("view", glm::mat4(glm::mat3(camera.getViewMatrix())));  // Remove translation component of view matrix
-	skyboxShader.setMat4("projection", camera.getProjectionMatrix(scrWidth, scrHeight));
+	skyboxShader.setMat4("projection", camera.getProjectionMatrix(static_cast<float>(scrWidth), static_cast<float>(scrHeight)));
 	draw(skyboxShader); // Call the existing draw method
 	glDepthFunc(GL_LESS); // Reset depth function to default
+}
+
+void Skybox::cleanup() {
+	std::cout << "Cleaning up Skybox resources..." << std::endl;
+
+	// Clean up VAO
+	if (MVao != 0) {
+		glDeleteVertexArrays(1, &MVao);
+		MVao = 0;
+	}
+
+	// Clean up the cubemap texture
+	if (MCubeMapTexture != 0) {
+		glDeleteTextures(1, &MCubeMapTexture);
+		MCubeMapTexture = 0;
+	}
 }
 
 void Skybox::setupSkybox()

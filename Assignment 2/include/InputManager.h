@@ -43,8 +43,8 @@ private:
     bool MCursorVisible;
     bool MFirstMouse;
 
-    float MLastX;
-    float MLastY;
+    double MLastX;
+    double MLastY;
 
     std::unordered_map<int, bool> MKeyState;
 };

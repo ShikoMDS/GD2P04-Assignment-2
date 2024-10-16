@@ -1,5 +1,13 @@
 #include "InputManager.h"
+#include "Scene.h"
+#include "Scene1.h"
+#include "Scene2.h"  // Include your Scene2 here
 #include <iostream>
+
+extern std::unique_ptr<Scene> currentScene;
+extern SceneType activeScene;
+extern Camera GCamera;
+extern LightManager GLightManager;
 
 InputManager::InputManager(Camera& Camera, LightManager& LightManager)
     : MCamera(Camera), MLightManager(LightManager), MWireframe(false), MCursorVisible(false),
@@ -90,12 +98,47 @@ void InputManager::toggleCursorVisibility(GLFWwindow* Window)
     }
 }
 
-void InputManager::changeScene(int sceneNumber)
-{
+void InputManager::changeScene(int sceneNumber) {
     std::cout << "Changing to scene " << sceneNumber << std::endl;
-    // Implement scene unloading and loading logic here
-}
 
+    SceneType newScene = static_cast<SceneType>(sceneNumber - 1);  // Assuming sceneNumber 1 corresponds to SCENE_1, 2 to SCENE_2, etc.
+
+    if (currentScene == nullptr || activeScene != newScene) {
+        if (currentScene) {
+            std::cout << "Cleaning up current scene..." << std::endl;
+            currentScene->cleanup();  // Clean up the previous scene
+        }
+
+        std::cout << "Attempting to create new scene..." << std::endl;
+
+        switch (newScene) {
+        case SceneType::SCENE_1:
+            std::cout << "Switching to Scene 1..." << std::endl;
+            currentScene = std::make_unique<Scene1>(GCamera, GLightManager);
+            break;
+        case SceneType::SCENE_2:
+            std::cout << "Switching to Scene 2..." << std::endl;
+            currentScene = std::make_unique<Scene2>(GCamera, GLightManager);  // Assuming Scene2 is implemented
+            break;
+        default:
+            std::cerr << "Invalid scene number!" << std::endl;
+            return;
+        }
+
+        if (currentScene) {
+            currentScene->load();
+            std::cout << "Scene loaded successfully." << std::endl;
+        }
+        else {
+            std::cerr << "Failed to load the new scene." << std::endl;
+        }
+
+        activeScene = newScene;
+    }
+    else {
+        std::cout << "Already in the active scene, no need to switch." << std::endl;
+    }
+}
 void InputManager::frameBufferSizeCallback(GLFWwindow* Window, const int Width, const int Height)
 {
     glViewport(0, 0, Width, Height);
@@ -114,14 +157,14 @@ void InputManager::mouseCallback(GLFWwindow* Window, const double PosX, const do
         MFirstMouse = false;
     }
 
-    const float OffsetX = PosX - MLastX;
-    const float OffsetY = MLastY - PosY;  // Reversed since y-coordinates go from bottom to top
+    const double OffsetX = PosX - MLastX;
+    const double OffsetY = MLastY - PosY;  // Reversed since y-coordinates go from bottom to top
 
     MLastX = PosX;
     MLastY = PosY;
 
     // Update the camera's yaw and pitch based on the mouse movement
-    MCamera.processMouseMovement(OffsetX, OffsetY);
+    MCamera.processMouseMovement(static_cast<float>(OffsetX), static_cast<float>(OffsetY));
 }
 
 void InputManager::scrollCallback(GLFWwindow* Window, double OffsetX, const double OffsetY) const

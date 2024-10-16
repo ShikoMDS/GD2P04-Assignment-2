@@ -37,6 +37,12 @@ void Model::draw(const Shader& Shader) const
 		Mesh.draw(Shader);
 }
 
+void Model::cleanup() {
+	for (Mesh& mesh : MMeshes) {  // Assuming `meshes` is a std::vector<Mesh>
+		mesh.cleanup();  // Call cleanup on each Mesh in the Model
+	}
+}
+
 void Model::loadModel(const std::string& Path)
 {
 	stbi_set_flip_vertically_on_load(true);

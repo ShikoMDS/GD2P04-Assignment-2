@@ -47,7 +47,7 @@ public:
 	void setVec3(const std::string& Name, float X, float Y, float Z) const;
 	void setMat4(const std::string& Name, const glm::mat4& Mat) const;
 	void setLight(const std::string& Name, const Light& Light) const;
-
+	GLuint getId();
 	static void checkCompileErrors(unsigned int Shader, const std::string& Type);
 	static void checkLinkErrors(unsigned int Program);
 

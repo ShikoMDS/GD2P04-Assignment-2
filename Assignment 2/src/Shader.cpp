@@ -41,7 +41,8 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath)
     }
     catch (std::ifstream::failure& e)
     {
-        std::cerr << "ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ\n";
+        std::cerr << "ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ" << std::endl;
+        std::cerr << "Exception message: " << e.what() << std::endl;
     }
 
     const char* vShaderCode = vertexCode.c_str();
@@ -112,6 +113,11 @@ void Shader::setLight(const std::string& Name, const Light& Light) const
 	setVec3(Name + ".ambient", Light.Ambient);
 	setVec3(Name + ".diffuse", Light.Diffuse);
 	setVec3(Name + ".specular", Light.Specular);
+}
+
+GLuint Shader::getId()
+{
+    return Id;
 }
 
 void Shader::checkCompileErrors(const unsigned int Shader, const std::string& Type)

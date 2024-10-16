@@ -127,6 +127,7 @@
       <AdditionalLibraryDirectories>$(ProjectDir)lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>opengl32.lib;glfw3.lib;glew32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>LIBCMT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <AdditionalOptions>/NODEFAULTLIB:MSVCRT %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -158,6 +159,11 @@
     <ClCompile Include="src\LightManager.cpp" />
     <ClCompile Include="src\Mesh.cpp" />
     <ClCompile Include="src\Model.cpp" />
+    <ClCompile Include="src\Scene.cpp" />
+    <ClCompile Include="src\Scene1.cpp" />
+    <ClCompile Include="src\Scene2.cpp" />
+    <ClCompile Include="src\Scene3.cpp" />
+    <ClCompile Include="src\Scene4.cpp" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\Skybox.cpp" />
   </ItemGroup>
@@ -175,6 +181,11 @@
     <ClInclude Include="include\LightManager.h" />
     <ClInclude Include="include\Mesh.h" />
     <ClInclude Include="include\Model.h" />
+    <ClInclude Include="include\Scene.h" />
+    <ClInclude Include="include\Scene1.h" />
+    <ClInclude Include="include\Scene2.h" />
+    <ClInclude Include="include\Scene3.h" />
+    <ClInclude Include="include\Scene4.h" />
     <ClInclude Include="include\Shader.h" />
     <ClInclude Include="include\Skybox.h" />
   </ItemGroup>

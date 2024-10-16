@@ -78,6 +78,7 @@ public:
 	Mesh(std::vector<Vertex> Vertices, std::vector<unsigned int> Indices, std::vector<Texture> Textures);
 
 	void draw(const Shader& Shader) const;
+	void cleanup();  // Add this method to clean up the Mesh
 
 	std::vector<Vertex> Vertices;
 	std::vector<unsigned int> Indices;

@@ -29,6 +29,7 @@ public:
 
 	void draw(const Shader& Shader) const;
 	void render(const Shader& skyboxShader, const Camera& camera, int scrWidth, int scrHeight) const;
+	void cleanup();
 
 private:
 	void setupSkybox();

@@ -28,6 +28,7 @@ public:
 	Model(const std::string& ModelPath, const std::string& TexturePath);
 
 	void draw(const Shader& Shader) const;
+	void cleanup();
 
 private:
 	void loadModel(const std::string& Path);

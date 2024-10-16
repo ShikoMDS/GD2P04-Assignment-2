@@ -45,6 +45,30 @@ void Mesh::draw(const Shader& Shader) const
 	glActiveTexture(GL_TEXTURE0);
 }
 
+void Mesh::cleanup() {
+	// Delete VAO, VBO, and EBO
+	if (MVao != 0) {
+		glDeleteVertexArrays(1, &MVao);
+		MVao = 0;
+	}
+	if (MVbo != 0) {
+		glDeleteBuffers(1, &MVbo);
+		MVbo = 0;
+	}
+	if (MEbo != 0) {
+		glDeleteBuffers(1, &MEbo);
+		MEbo = 0;
+	}
+
+	// Delete textures
+	for (auto& texture : Textures) {
+		if (texture.Id != 0) {
+			glDeleteTextures(1, &texture.Id);
+			texture.Id = 0;
+		}
+	}
+}
+
 void Mesh::setupMesh()
 {
 	glGenVertexArrays(1, &MVao);
