@@ -68,7 +68,7 @@ public:
 	[[nodiscard]] const PointLight& getPointLight(int Index) const;
 
 private:
-	PointLight MPointLights[2];
+	PointLight MPointLights[10];
 	DirectionalLight MDirectionalLight;
 	SpotLight MSpotLight;
 

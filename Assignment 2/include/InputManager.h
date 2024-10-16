@@ -24,26 +24,26 @@ Mail : ayoub.ahmad@mds.ac.nz
 class InputManager
 {
 public:
-	InputManager(Camera& Camera, LightManager& LightManager);
+    InputManager(Camera& Camera, LightManager& LightManager);
 
-	void processInput(GLFWwindow* Window, float DeltaTime);
-	void frameBufferSizeCallback(GLFWwindow* Window, int Width, int Height);
-	void mouseCallback(GLFWwindow* Window, double PosX, double PosY);
-	void scrollCallback(GLFWwindow* Window, double OffsetX, double OffsetY) const;
-	void toggleWireframeMode();
-	void toggleCursorVisibility(GLFWwindow* Window);
+    void processInput(GLFWwindow* Window, float DeltaTime);
+    void frameBufferSizeCallback(GLFWwindow* Window, int Width, int Height);
+    void mouseCallback(GLFWwindow* Window, double PosX, double PosY);
+    void scrollCallback(GLFWwindow* Window, double OffsetX, double OffsetY) const;
+    void toggleWireframeMode();
+    void toggleCursorVisibility(GLFWwindow* Window);
+    void changeScene(int sceneNumber);  // Function to switch scenes
 
 private:
-	Camera& MCamera;
-	LightManager& MLightManager;
+    Camera& MCamera;
+    LightManager& MLightManager;
 
-	bool MWireframe;
-	bool MCursorVisible;
-	bool MFirstMouse;
+    bool MWireframe;
+    bool MCursorVisible;
+    bool MFirstMouse;
 
-	float MLastX;
-	float MLastY;
+    float MLastX;
+    float MLastY;
 
-	std::unordered_map<int, bool> MKeyState;
-	std::unordered_map<int, bool> MKeyToggleState;
+    std::unordered_map<int, bool> MKeyState;
 };

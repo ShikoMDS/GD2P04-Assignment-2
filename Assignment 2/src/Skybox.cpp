@@ -33,6 +33,16 @@ void Skybox::draw(const Shader& Shader) const
 	glBindVertexArray(0);
 }
 
+void Skybox::render(const Shader& skyboxShader, const Camera& camera, int scrWidth, int scrHeight) const
+{
+	glDepthFunc(GL_LEQUAL); // Ensure skybox is drawn correctly
+	skyboxShader.use();
+	skyboxShader.setMat4("view", glm::mat4(glm::mat3(camera.getViewMatrix())));  // Remove translation component of view matrix
+	skyboxShader.setMat4("projection", camera.getProjectionMatrix(scrWidth, scrHeight));
+	draw(skyboxShader); // Call the existing draw method
+	glDepthFunc(GL_LESS); // Reset depth function to default
+}
+
 void Skybox::setupSkybox()
 {
 	constexpr float SkyboxVertices[] = {

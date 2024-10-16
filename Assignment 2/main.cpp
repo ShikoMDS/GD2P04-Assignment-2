@@ -52,11 +52,6 @@ void frameBufferSizeCallback(GLFWwindow* Window, const int Width, const int Heig
 	GInputManager.frameBufferSizeCallback(Window, Width, Height);
 }
 
-void mouseCallback(GLFWwindow* Window, const double PosX, const double PosY)
-{
-	GInputManager.mouseCallback(Window, PosX, PosY);
-}
-
 void scrollCallback(GLFWwindow* Window, const double OffsetX, const double OffsetY)
 {
 	GInputManager.scrollCallback(Window, OffsetX, OffsetY);
@@ -68,6 +63,19 @@ void checkGlError(const std::string& Location)
 	while ((Err = glGetError()) != GL_NO_ERROR)
 	{
 		std::cerr << "OpenGL error at " << Location << ": " << Err << '\n';
+	}
+}
+
+void enableRawMouseMotion(GLFWwindow* window)
+{
+	if (glfwRawMouseMotionSupported())  // Check if raw mouse motion is supported
+	{
+		glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);  // Enable raw mouse motion
+		std::cout << "Raw mouse motion enabled." << std::endl;
+	}
+	else
+	{
+		std::cout << "Raw mouse motion not supported on this system." << std::endl;
 	}
 }
 
@@ -93,9 +101,15 @@ int main()
 		return -1;
 	}
 	glfwMakeContextCurrent(Window);
+	// Enable raw mouse motion
+	enableRawMouseMotion(Window);
 	glfwSetFramebufferSizeCallback(Window, frameBufferSizeCallback);
-	glfwSetCursorPosCallback(Window, mouseCallback);
-	glfwSetScrollCallback(Window, scrollCallback);
+	glfwSetCursorPosCallback(Window, [](GLFWwindow* window, double xpos, double ypos) {
+		GInputManager.mouseCallback(window, xpos, ypos);
+		});
+	glfwSetScrollCallback(Window, [](GLFWwindow* window, double xoffset, double yoffset) {
+		GInputManager.scrollCallback(window, xoffset, yoffset);  // Use InputManager's scroll callback
+		});
 
 	// Capture the mouse
 	glfwSetInputMode(Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -110,6 +124,8 @@ int main()
 	// Configure global OpenGL state
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE); // Enable back-face culling
+	glCullFace(GL_BACK);    // Cull back faces by default
+	glFrontFace(GL_CCW);    // Define the front face as counter-clockwise (default)
 	glEnable(GL_MULTISAMPLE); // Enable MSAA
 
 	// Build and compile shaders
@@ -143,7 +159,7 @@ int main()
 		"resources/skybox/Corona/Back.png",
 		"resources/skybox/Corona/Front.png"
 	};
-	Skybox Skybox(Faces);
+	Skybox LSkybox(Faces);
 
 	// Initialize lighting
 	GLightManager.initialize();
@@ -254,12 +270,7 @@ int main()
 		checkGlError("After Sphere Draw");
 
 		// Render skybox
-		glDepthFunc(GL_LEQUAL);
-		SkyboxShader.use();
-		SkyboxShader.setMat4("view", glm::mat4(glm::mat3(GCamera.getViewMatrix())));
-		SkyboxShader.setMat4("projection", GCamera.getProjectionMatrix(ScrWidth, ScrHeight));
-		Skybox.draw(SkyboxShader);
-		glDepthFunc(GL_LESS);
+		LSkybox.render(SkyboxShader, GCamera, ScrWidth, ScrHeight); // Just call the new render method
 
 		checkGlError("After Skybox Draw");
 

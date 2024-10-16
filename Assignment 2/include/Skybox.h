@@ -20,12 +20,15 @@ Mail : ayoub.ahmad@mds.ac.nz
 #include <glm.hpp>
 #include <vector>
 
+#include "Camera.h"
+
 class Skybox
 {
 public:
-	explicit Skybox(const std::vector<std::string>& Faces);
+	Skybox(const std::vector<std::string>& Faces);
 
 	void draw(const Shader& Shader) const;
+	void render(const Shader& skyboxShader, const Camera& camera, int scrWidth, int scrHeight) const;
 
 private:
 	void setupSkybox();
