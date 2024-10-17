@@ -16,8 +16,12 @@ public:
 
 private:
     Shader LightingShader;
+    Shader SkyboxShader;
     Model GardenPlant;
+    Model Tree;
+    Model Statue;
     Model Sphere;
+    Skybox LSkybox;
     Camera& GCamera;
     LightManager& GLightManager;
     Material material;

@@ -5,11 +5,13 @@
 #include "Skybox.h"
 #include "Camera.h"
 #include "LightManager.h"
+#include "Terrain.h"  // Include the Terrain header
 #include <iostream>
 
 class Scene1 : public Scene {
 public:
     Scene1(Camera& camera, LightManager& lightManager);
+
     void load() override;
     void update(float deltaTime) override;
     void render() override;
@@ -18,12 +20,13 @@ public:
 private:
     Shader LightingShader;
     Shader SkyboxShader;
-    Model GardenPlant;
-    Model Tree;
-    Model Statue;
-    Model Sphere;
+    Shader TerrainShader;
+    Model GardenPlant, Tree, Statue, Sphere;
     Skybox LSkybox;
     Camera& GCamera;
     LightManager& GLightManager;
     Material material;
+
+    // Add terrain instance
+    Terrain terrain;
 };

@@ -53,7 +53,7 @@ int main() {
     glfwWindowHint(GLFW_SAMPLES, 4); // Enable MSAA
 
     // Create window and OpenGL context
-    GLFWwindow* Window = glfwCreateWindow(ScrWidth, ScrHeight, "OpenGL Lighting Demo", nullptr, nullptr);
+    GLFWwindow* Window = glfwCreateWindow(ScrWidth, ScrHeight, "OpenGL More Framebuffers and Shaders", nullptr, nullptr);
     if (!Window) {
         std::cerr << "Failed to create GLFW window" << '\n';
         glfwTerminate();

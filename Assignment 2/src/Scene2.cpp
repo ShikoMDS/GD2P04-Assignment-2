@@ -3,22 +3,29 @@
 #include <gtc/matrix_transform.hpp>
 #include <iostream>
 
+constexpr float ModelScaleFactor = 0.01f;
 constexpr float PlantScaleFactor = 0.005f;
 constexpr float SphereScaleFactor = 0.5f;
 
 Scene2::Scene2(Camera& camera, LightManager& lightManager)
-	: LightingShader("resources/shaders/VertexShader.vert", "resources/shaders/FragmentShader.frag"), GardenPlant(
-		  "resources/models/AncientEmpire/SM_Env_Garden_Plants_01.obj",
-		  "PolygonAncientWorlds_Texture_01_A.png"), Sphere("resources/models/Sphere/Sphere_HighPoly.obj", ""),
-	  GCamera(camera),
-	  GLightManager(lightManager),
-	  material()
+	: LightingShader("resources/shaders/VertexShader.vert", "resources/shaders/FragmentShader.frag"),
+    SkyboxShader("resources/shaders/SkyboxVertexShader.vert", "resources/shaders/SkyboxFragmentShader.frag"),
+    GardenPlant("resources/models/AncientEmpire/SM_Env_Garden_Plants_01.obj",
+        "PolygonAncientWorlds_Texture_01_A.png"),
+    Tree("resources/models/AncientEmpire/SM_Env_Tree_Palm_01.obj", "PolygonAncientWorlds_Texture_01_A.png"),
+    Statue("resources/models/AncientEmpire/SM_Prop_Statue_01.obj", "PolygonAncientWorlds_Texture_01_A.png"),
+    Sphere("resources/models/Sphere/Sphere_HighPoly.obj", ""),
+    GCamera(camera),
+    GLightManager(lightManager),
+    material()
 {
 	std::cout << "Scene2 constructor called" << std::endl;
 }
 
 void Scene2::load() {
     std::cout << "Loading resources for Scene2..." << std::endl;
+    // Initialize lighting
+    GLightManager.initialize();
 
     // Initialize material
     material.Ambient = glm::vec3(1.0f, 1.0f, 1.0f);
@@ -68,6 +75,27 @@ void Scene2::render() {
         }
     }
 
+    // Render trees
+    glm::vec3 TreePositions[] = {
+        {-5.0f, -1.0f, -5.0f}, {5.0f, -1.0f, -5.0f},
+        {-5.0f, -1.0f, 5.0f}, {5.0f, -1.0f, 5.0f}
+    };
+
+    for (glm::vec3 Pos : TreePositions) {
+        ModelMatrix = glm::mat4(1.0f);
+        ModelMatrix = glm::translate(ModelMatrix, Pos);
+        ModelMatrix = glm::scale(ModelMatrix, glm::vec3(ModelScaleFactor));
+        LightingShader.setMat4("model", ModelMatrix);
+        Tree.draw(LightingShader);  // Draw tree model
+    }
+
+    // Render statue
+    ModelMatrix = glm::mat4(1.0f);
+    ModelMatrix = glm::translate(ModelMatrix, glm::vec3(0.0f, -1.0f, 0.0f));
+    ModelMatrix = glm::scale(ModelMatrix, glm::vec3(ModelScaleFactor));
+    LightingShader.setMat4("model", ModelMatrix);
+    Statue.draw(LightingShader);  // Draw statue model
+
     // Render point light spheres
     glm::vec3 SpherePositions[] = {
         glm::vec3(-2.0f, 0.5f, 0.0f),
@@ -88,19 +116,30 @@ void Scene2::render() {
 
         Sphere.draw(LightingShader);  // Draw sphere (light source indicators)
     }
+
+    // Render skybox
+    LSkybox.render(SkyboxShader, GCamera, 800, 600);
+
+    // Swap buffers and poll events are handled outside this function in the main loop
 }
 
 void Scene2::cleanup() {
     std::cout << "Cleaning up Scene2 resources..." << std::endl;
 
-    // 1. Delete shader program to free GPU resources
-    if (LightingShader.getId() != 0) {  // Check if shader is valid
-        glDeleteProgram(LightingShader.getId());  // Assuming getID() returns shader program ID
+    // 1. Clean up shaders
+    if (LightingShader.getId() != 0) {
+        glDeleteProgram(LightingShader.getId());  // Assuming getID() returns the shader program ID
+    }
+    if (SkyboxShader.getId() != 0) {
+        glDeleteProgram(SkyboxShader.getId());
     }
 
-    // 2. Clean up models (delete VAOs, VBOs, etc.)
-    GardenPlant.cleanup();  // Assuming Model has a cleanup method
-    Sphere.cleanup();       // Cleanup resources for Sphere model
+    // 2. Clean up models (GardenPlant, Tree, Statue, Sphere)
+    GardenPlant.cleanup();  // Assuming Model::cleanup() is implemented
+    Tree.cleanup();
+    Statue.cleanup();
+    Sphere.cleanup();
 
-    // Add more cleanup if you have other OpenGL objects like textures or buffers
+    // 3. Clean up skybox resources if necessary
+    LSkybox.cleanup();  // Assuming Skybox has a cleanup method that deletes its VAO, textures, etc.
 }

@@ -166,6 +166,7 @@
     <ClCompile Include="src\Scene4.cpp" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\Skybox.cpp" />
+    <ClCompile Include="src\Terrain.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\FragmentShader.frag" />
@@ -173,6 +174,8 @@
     <None Include="resources\shaders\ReflectionVertexShader.vert" />
     <None Include="resources\shaders\SkyboxFragmentShader.frag" />
     <None Include="resources\shaders\SkyboxVertexShader.vert" />
+    <None Include="resources\shaders\TerrainFragmentShader.frag" />
+    <None Include="resources\shaders\TerrainVertexShader.vert" />
     <None Include="resources\shaders\VertexShader.vert" />
   </ItemGroup>
   <ItemGroup>
@@ -188,6 +191,7 @@
     <ClInclude Include="include\Scene4.h" />
     <ClInclude Include="include\Shader.h" />
     <ClInclude Include="include\Skybox.h" />
+    <ClInclude Include="include\Terrain.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
