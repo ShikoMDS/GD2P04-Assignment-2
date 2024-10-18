@@ -21,7 +21,7 @@ private:
     Shader LightingShader;
     Shader SkyboxShader;
     Shader TerrainShader;
-    Model GardenPlant, Tree, Statue, Sphere;
+    Model GardenPlant, Tree, Statue;
     Skybox LSkybox;
     Camera& GCamera;
     LightManager& GLightManager;

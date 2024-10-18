@@ -9,14 +9,17 @@ constexpr float SphereScaleFactor = 0.5f;
 Scene4::Scene4(Camera& camera, LightManager& lightManager)
 	: LightingShader("resources/shaders/VertexShader.vert", "resources/shaders/FragmentShader.frag"),
 	  SkyboxShader("resources/shaders/SkyboxVertexShader.vert", "resources/shaders/SkyboxFragmentShader.frag"),
+	  TerrainShader("resources/shaders/TerrainVertexShader.vert", "resources/shaders/TerrainFragmentShader.frag"),
+	  // Terrain shader
 	  GardenPlant("resources/models/AncientEmpire/SM_Env_Garden_Plants_01.obj",
 	              "PolygonAncientWorlds_Texture_01_A.png"),
 	  Tree("resources/models/AncientEmpire/SM_Env_Tree_Palm_01.obj", "PolygonAncientWorlds_Texture_01_A.png"),
 	  Statue("resources/models/AncientEmpire/SM_Prop_Statue_01.obj", "PolygonAncientWorlds_Texture_01_A.png"),
-	  Sphere("resources/models/Sphere/Sphere_HighPoly.obj", ""),
+	  Sphere("resources/models/Sphere/Sphere_HighPoly.obj", "PolygonAncientWorlds_Texture_01_A.png"),
 	  GCamera(camera),
 	  GLightManager(lightManager),
-	  material()
+	  material(), 
+    terrain(HeightMapInfo{ "resources/heightmap/Heightmap0.raw", 100, 100, 1.0f })
 {
 	std::cout << "Scene4 constructor called" << std::endl;
 }
@@ -42,7 +45,22 @@ void Scene4::render() {
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // Activate the lighting shader and set view/projection matrices
+    // Activate the terrain shader and set view/projection matrices
+    TerrainShader.use();  // Use the terrain shader
+    TerrainShader.setMat4("view", GCamera.getViewMatrix());
+    TerrainShader.setMat4("projection", GCamera.getProjectionMatrix(800, 600));
+
+    glm::mat4 modelMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f, 0.05f, 0.1f)); // Scale down height (Y) more than width/depth
+    modelMatrix = glm::translate(modelMatrix, glm::vec3(0.0f, 0.0f, 0.0f)); // Adjust terrain position if necessary
+    TerrainShader.setMat4("model", modelMatrix);
+
+    terrain.DrawTerrain();  // Draw terrain
+
+    glCullFace(GL_BACK);
+    // Global translation to move models by 15 units towards the positive Z axis
+    glm::mat4 globalTranslation = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 15.0f));
+
+    // Switch to the lighting shader for other objects
     LightingShader.use();
     LightingShader.setMat4("view", GCamera.getViewMatrix());
     LightingShader.setMat4("projection", GCamera.getProjectionMatrix(800, 600));
@@ -55,69 +73,78 @@ void Scene4::render() {
     // Set material properties for objects
     LightingShader.setMaterial(material);
 
-    // Update lighting based on toggles (point lights, directional lights, etc.)
-    GLightManager.updateLighting(LightingShader);
-
     // Render garden plants as ground
     LightingShader.setBool("useTexture", true);
-    glm::mat4 ModelMatrix = glm::mat4(1.0f);
+    modelMatrix = glm::mat4(1.0f);
 
     for (int X = -5; X <= 5; X++) {
         for (int Z = -5; Z <= 5; Z++) {
-            ModelMatrix = glm::mat4(1.0f);
-            ModelMatrix = glm::translate(ModelMatrix, glm::vec3(X, -1.0f, Z));
-            ModelMatrix = glm::scale(ModelMatrix, glm::vec3(PlantScaleFactor));
-            LightingShader.setMat4("model", ModelMatrix);
-            GardenPlant.draw(LightingShader);  // Draw plant model
+            modelMatrix = glm::mat4(1.0f);
+            modelMatrix = glm::translate(modelMatrix, glm::vec3(X, 0.0f, Z * 0.8f));
+            modelMatrix = glm::scale(modelMatrix, glm::vec3(PlantScaleFactor));
+            modelMatrix = globalTranslation * modelMatrix;  // Apply global translation
+            LightingShader.setMat4("model", modelMatrix);
+            GardenPlant.draw(LightingShader);
         }
     }
 
     // Render trees
     glm::vec3 TreePositions[] = {
-        {-5.0f, -1.0f, -5.0f}, {5.0f, -1.0f, -5.0f},
-        {-5.0f, -1.0f, 5.0f}, {5.0f, -1.0f, 5.0f}
+        {-6.0f, 0.0f, -5.0f}, {6.0f, 0.0f, -5.0f},
+        {-6.0f, 0.0f, 5.0f}, {6.0f, 0.0f, 5.0f}
     };
 
     for (glm::vec3 Pos : TreePositions) {
-        ModelMatrix = glm::mat4(1.0f);
-        ModelMatrix = glm::translate(ModelMatrix, Pos);
-        ModelMatrix = glm::scale(ModelMatrix, glm::vec3(ModelScaleFactor));
-        LightingShader.setMat4("model", ModelMatrix);
-        Tree.draw(LightingShader);  // Draw tree model
+        modelMatrix = glm::mat4(1.0f);
+        modelMatrix = glm::translate(modelMatrix, Pos);
+        modelMatrix = glm::scale(modelMatrix, glm::vec3(ModelScaleFactor));
+        modelMatrix = globalTranslation * modelMatrix;  // Apply global translation
+        LightingShader.setMat4("model", modelMatrix);
+        Tree.draw(LightingShader);
     }
 
     // Render statue
-    ModelMatrix = glm::mat4(1.0f);
-    ModelMatrix = glm::translate(ModelMatrix, glm::vec3(0.0f, -1.0f, 0.0f));
-    ModelMatrix = glm::scale(ModelMatrix, glm::vec3(ModelScaleFactor));
-    LightingShader.setMat4("model", ModelMatrix);
-    Statue.draw(LightingShader);  // Draw statue model
+    modelMatrix = glm::mat4(1.0f);
+    modelMatrix = glm::translate(modelMatrix, glm::vec3(0.0f, 0.0f, 0.0f));
+    modelMatrix = glm::scale(modelMatrix, glm::vec3(ModelScaleFactor));
+    modelMatrix = globalTranslation * modelMatrix;  // Apply global translation
+    LightingShader.setMat4("model", modelMatrix);
+    Statue.draw(LightingShader);
 
     // Render point light spheres
     glm::vec3 SpherePositions[] = {
-        glm::vec3(-2.0f, 0.5f, 0.0f),
-        glm::vec3(2.0f, 0.5f, 0.0f)
+        glm::vec3(-2.0f, 1.5f, 0.0f),
+        glm::vec3(2.0f, 1.5f, 0.0f)
     };
 
+    // Apply global translation to the point lights
     LightingShader.setBool("useTexture", false);
 
     for (int I = 0; I < 2; I++) {
-        ModelMatrix = glm::mat4(1.0f);
-        ModelMatrix = glm::translate(ModelMatrix, SpherePositions[I]);
-        ModelMatrix = glm::scale(ModelMatrix, glm::vec3(SphereScaleFactor));
-        LightingShader.setMat4("model", ModelMatrix);
+        // Create a non-const copy of the position before applying the translation
+        glm::vec3 TranslatedSpherePosition = SpherePositions[I] + glm::vec3(0.0f, 0.0f, 15.0f);  // Move light positions by 15 units in Z
 
-        // Update sphere colors based on point light state
+        // Update light position in shader
+        GLightManager.getPointLight(I).Position = TranslatedSpherePosition;
+        LightingShader.setVec3("pointLights[" + std::to_string(I) + "].position", TranslatedSpherePosition);
+
+        // Set up the sphere model for rendering
+        glm::mat4 modelMatrix = glm::mat4(1.0f);
+        modelMatrix = glm::translate(modelMatrix, TranslatedSpherePosition);  // Use translated position for sphere rendering
+        modelMatrix = glm::scale(modelMatrix, glm::vec3(SphereScaleFactor));
+        LightingShader.setMat4("model", modelMatrix);
+
         glm::vec3 SphereColor = GLightManager.isPointLightsOn() ? GLightManager.getPointLight(I).Colour : glm::vec3(0.0f);
         LightingShader.setVec3("solidColor", SphereColor);
 
-        Sphere.draw(LightingShader);  // Draw sphere (light source indicators)
+        Sphere.draw(LightingShader);
     }
+
+
+    GLightManager.updateLighting(LightingShader);  // Update lighting for shaders
 
     // Render skybox
     LSkybox.render(SkyboxShader, GCamera, 800, 600);
-
-    // Swap buffers and poll events are handled outside this function in the main loop
 }
 
 void Scene4::cleanup() {

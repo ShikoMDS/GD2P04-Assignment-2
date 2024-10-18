@@ -5,6 +5,7 @@
 #include "Skybox.h"
 #include "Camera.h"
 #include "LightManager.h"
+#include "Terrain.h"
 #include <iostream>
 
 class Scene4 : public Scene {
@@ -18,6 +19,7 @@ public:
 private:
     Shader LightingShader;
     Shader SkyboxShader;
+    Shader TerrainShader;
     Model GardenPlant;
     Model Tree;
     Model Statue;
@@ -26,4 +28,5 @@ private:
     Camera& GCamera;
     LightManager& GLightManager;
     Material material;
+    Terrain terrain;
 };

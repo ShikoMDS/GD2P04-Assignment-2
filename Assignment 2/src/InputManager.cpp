@@ -1,7 +1,9 @@
 #include "InputManager.h"
 #include "Scene.h"
 #include "Scene1.h"
-#include "Scene2.h"  // Include your Scene2 here
+#include "Scene2.h" 
+#include "Scene3.h" 
+#include "Scene4.h" 
 #include <iostream>
 
 extern std::unique_ptr<Scene> currentScene;
@@ -119,6 +121,14 @@ void InputManager::changeScene(int sceneNumber) {
         case SceneType::SCENE_2:
             std::cout << "Switching to Scene 2..." << std::endl;
             currentScene = std::make_unique<Scene2>(GCamera, GLightManager);  // Assuming Scene2 is implemented
+            break;
+        case SceneType::SCENE_3:
+            std::cout << "Switching to Scene 3..." << std::endl;
+            currentScene = std::make_unique<Scene3>(GCamera, GLightManager);  // Assuming Scene2 is implemented
+            break;
+        case SceneType::SCENE_4:
+            std::cout << "Switching to Scene 4..." << std::endl;
+            currentScene = std::make_unique<Scene4>(GCamera, GLightManager);  // Assuming Scene2 is implemented
             break;
         default:
             std::cerr << "Invalid scene number!" << std::endl;
