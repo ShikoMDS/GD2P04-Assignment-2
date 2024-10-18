@@ -65,7 +65,7 @@ public:
 	[[nodiscard]] SpotLight getSpotLight() const;
 
 	[[nodiscard]] bool isPointLightsOn() const;
-	[[nodiscard]] const PointLight& getPointLight(int Index) const;
+	[[nodiscard]] PointLight& getPointLight(int Index);
 
 private:
 	PointLight MPointLights[10];

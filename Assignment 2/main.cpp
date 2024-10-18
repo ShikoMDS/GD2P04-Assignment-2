@@ -19,7 +19,7 @@ float DeltaTime = 0.0f;
 float LastFrame = 0.0f;
 
 // Camera
-Camera GCamera(glm::vec3(0.0f, 0.0f, 5.0f));
+Camera GCamera(glm::vec3(0.0f, 5.0f, 30.0f));
 
 // Lighting
 LightManager GLightManager;

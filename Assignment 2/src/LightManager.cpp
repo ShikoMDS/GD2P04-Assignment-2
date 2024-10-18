@@ -14,6 +14,11 @@ Mail : ayoub.ahmad@mds.ac.nz
 
 #include "LightManager.h"
 
+#include "Camera.h"
+#include "Camera.h"
+#include "Camera.h"
+#include "Camera.h"
+
 LightManager::LightManager() = default;
 
 void LightManager::initialize()
@@ -104,7 +109,7 @@ bool LightManager::isPointLightsOn() const
 	return MPointLightsOn;
 }
 
-const PointLight& LightManager::getPointLight(const int Index) const
+PointLight& LightManager::getPointLight(int Index) 
 {
 	return MPointLights[Index];
 }
